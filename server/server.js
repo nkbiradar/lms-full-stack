@@ -12,25 +12,34 @@ import courseRouter from './routes/courseRoute.js'
 // Initialize Express
 const app = express()
 
-// Connect to database
+// CORS Configuration — allow frontend origin (localhost:5173 for dev)
+app.use(cors({
+  origin: 'https://lms-full-stack-server-steel.vercel.app/', // or use '*' for any origin in dev, but this is more secure
+  credentials: true
+}))
+
+// Connect to database and Cloudinary
 await connectDB()
 await connectCloudinary()
 
-// Middlewares
-app.use(cors())
-app.use(clerkMiddleware())
+// Parse JSON and apply middlewares
+app.use(express.json())          // To parse JSON bodies
+app.use(clerkMiddleware())       // Clerk middleware for authentication
 
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
-app.post('/clerk', express.json() , clerkWebhooks)
+
+// Webhooks
+app.post('/clerk', express.json(), clerkWebhooks)
 app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebhooks)
-app.use('/api/educator', express.json(), educatorRouter)
-app.use('/api/course', express.json(), courseRouter)
-app.use('/api/user', express.json(), userRouter)
 
-// Port
+// API Routes
+app.use('/api/educator', educatorRouter)
+app.use('/api/course', courseRouter)
+app.use('/api/user', userRouter)
+
+// Start server
 const PORT = process.env.PORT || 5000
-
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`✅ Server is running on port ${PORT}`);
 })
