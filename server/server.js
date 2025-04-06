@@ -14,8 +14,8 @@ const app = express()
 
 // ✅ Proper CORS Configuration
 const allowedOrigins = [
-  'http://localhost:5174', // local frontend during development
-  'https://lms-full-stack-gules.vercel.app/' // deployed frontend URL — replace this!
+  'http://localhost:5174', // local
+  'https://lms-full-stack-gules.vercel.app' // ✅ no trailing slash
 ]
 
 app.use(cors({
